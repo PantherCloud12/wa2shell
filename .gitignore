@@ -1,0 +1,28 @@
+# Dependency directories
+node_modules/
+
+# Environment variables
+.env
+.env.local
+
+# WhatsApp authentication & session
+session/
+sessions/
+*auth_info_baileys*
+*.session*
+
+# Temporary files & media
+tmp/*
+!tmp/.gitkeep
+temp/
+*.log
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
