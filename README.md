@@ -29,6 +29,8 @@ Whether you need to monitor server health on the go, kick off deployment scripts
   Keeps multi-turn conversational context intact for each chat thread, backed by automatic memory management and TTL expiration.
 - **Hot Model Switching**  
   Switch active agent models on the fly (e.g., Gemini, Claude) via `.model <model-name>` without taking down the daemon or interrupting connected clients.
+- **Zero-Downtime Hot Reload**  
+  Built-in file watcher and `.reload` command that instantly refreshes modules (`lib/` & `config.js`) on change without dropping the WhatsApp socket connection or restarting PM2.
 - **Automated Media & Artifact Delivery**  
   Dispatches files, diagnostic logs, generated images, voice notes, and reports straight into WhatsApp using structured action tags (`[[SEND_FILE:/path]]`).
 - **Owner Security Guard**  
@@ -130,6 +132,7 @@ If `USE_PAIRING_CODE=true` is enabled:
 | `$ <cmd>` | Execute a bash command on the VPS | `$ free -m` |
 | `.sh <cmd>` | Alternative syntax for bash execution | `.sh systemctl restart caddy` |
 | `.status` / `.ping` | Show uptime, memory stats, and disk usage | `.status` |
+| `.reload` / `.r` | Zero-downtime hot-reload all `lib/` modules without dropping WhatsApp session | `.reload` |
 | `.model` | Display currently loaded Antigravity agent model | `.model` |
 | `.model <id>` | Switch the agent backend model on the fly | `.model claude-sonnet-5-5-high` |
 | `.reset` / `.clear` | Purge active conversation context for this chat | `.reset` |

@@ -12,10 +12,57 @@ const {
 const pino = require("pino");
 const readline = require("readline");
 const qrcode = require("qrcode-terminal");
-const config = require("./config");
-const { handleMessage } = require("./lib/handler");
+const fs = require("fs");
+const path = require("path");
+let config = require("./config");
+let handlerModule = require("./lib/handler");
 
 const logger = pino({ level: "silent" });
+
+// Dynamic Module Reloader (Zero-Downtime Hot Reload)
+function reloadModules() {
+  const libDir = path.join(__dirname, "lib");
+  const configPath = path.join(__dirname, "config.js");
+
+  Object.keys(require.cache).forEach((key) => {
+    if (key === configPath || key.startsWith(libDir)) {
+      delete require.cache[key];
+    }
+  });
+
+  config = require("./config");
+  handlerModule = require("./lib/handler");
+  return true;
+}
+
+// Watch lib/ and config.js for file modifications
+function initHotReload() {
+  const watchTargets = [
+    path.join(__dirname, "config.js"),
+    path.join(__dirname, "lib"),
+  ];
+
+  let debounceTimer = null;
+  watchTargets.forEach((target) => {
+    if (!fs.existsSync(target)) return;
+    try {
+      fs.watch(target, { recursive: true }, (eventType, filename) => {
+        if (!filename || (!filename.endsWith(".js") && !filename.endsWith(".json"))) return;
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+          try {
+            reloadModules();
+            console.log(`[wa2shell] [HOT-RELOAD] Successfully refreshed modules after change in ${filename}`);
+          } catch (err) {
+            console.error(`[wa2shell] [HOT-RELOAD ERROR] Failed to reload ${filename}:`, err.message);
+          }
+        }, 150);
+      });
+    } catch (e) {
+      console.warn(`[wa2shell] Watcher error on ${target}:`, e.message);
+    }
+  });
+}
 
 async function askQuestion(prompt) {
   const rl = readline.createInterface({
@@ -97,10 +144,13 @@ async function startBot() {
     }
   });
 
+  // Initialize Zero-Downtime Hot Reload watcher
+  initHotReload();
+
   // Inbound message stream
   sock.ev.on("messages.upsert", async (m) => {
     try {
-      await handleMessage(sock, m);
+      await handlerModule.handleMessage(sock, m, { reloadModules });
     } catch (err) {
       console.error("[wa2shell] Error processing inbound message:", err);
     }
