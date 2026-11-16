@@ -40,31 +40,57 @@ Whether you need to monitor server health on the go, kick off deployment scripts
 
 ## Architecture
 
+```mermaid
+flowchart TD
+    subgraph Client["📱 Ingress Interface"]
+        WA["WhatsApp Client<br/>(Mobile / Desktop / Web)"]
+    end
+
+    subgraph Core["⚡ wa2shell Core Engine"]
+        Sock["Baileys Socket Bridge<br/><i>E2EE WebSocket Connection</i>"]
+        Guard{"Security Guard<br/><i>Owner Number Whitelist</i>"}
+        Router["Command Dispatcher<br/><i>Prefix Parser & Session Router</i>"]
+    end
+
+    subgraph Engines["⚙️ Dual Execution Engines"]
+        Bash["Direct Shell Runner<br/><code>/bin/bash (Stdout / Stderr)</code>"]
+        Agy["Antigravity AI Bridge<br/><code>agy CLI (stream-json IPC)</code>"]
+    end
+
+    subgraph Target["🖥️ Operating & Agent Environments"]
+        Linux["Linux Host Environment<br/><i>(Filesystem, PM2, Docker, Services)</i>"]
+        Agent["Autonomous Agent Subsystems<br/><i>(Tools, Memory, Reasoning, Context)</i>"]
+    end
+
+    WA <-->|"Encrypted WebSocket Protocol"| Sock
+    Sock -->|"Incoming Message Event"| Guard
+    Guard -->|"Authorized Owner"| Router
+    Guard -.->|"Unauthorized User"| Deny["Drop & Security Log"]
+
+    Router -->|"Prefix: $ or .sh"| Bash
+    Router -->|"Direct Chat / .ai / Mention"| Agy
+
+    Bash -->|"Executes Shell Commands"| Linux
+    Linux -->|"Exit Code & Runtime"| Bash
+
+    Agy -->|"Spawns IPC Stream"| Agent
+    Agent -->|"Tool Calls & Workspace Actions"| Linux
+    Agent -->|"Action Tags [[SEND_*]]"| Agy
+
+    Bash -->|"Formatted Monospace Output"| Sock
+    Agy -->|"Streaming Markdown & Media Assets"| Sock
 ```
-┌─────────────────────────────────┐
-│     WhatsApp Mobile Client      │
-└────────────────┬────────────────┘
-                 │ (E2EE WebSocket)
-┌────────────────▼────────────────────────────────────────┐
-│                        wa2shell                         │
-│                                                         │
-│  ┌────────────────────┐      ┌───────────────────────┐  │
-│  │ Baileys Connection │ ───► │  Dispatcher & Guard   │  │
-│  └────────────────────┘      └───────────┬───────────┘  │
-│                                          │              │
-│                 ┌────────────────────────┴─────────┐    │
-│                 ▼                                  ▼    │
-│        [ Direct Bash Exec ]             [ Antigravity ] │
-│        /bin/bash runner                 CLI Subprocess  │
-│        (Exit code, time)                (stream-json)   │
-└─────────────────┬──────────────────────────────────┬────┘
-                  │                                  │
-                  ▼                                  ▼
-      ┌───────────────────────┐          ┌───────────────────────┐
-      │   Linux Host System   │          │  AI Agent Subsystems  │
-      │  (Files, Docker, PM2) │          │  (Tools, Memory, SDK) │
-      └───────────────────────┘          └───────────────────────┘
-```
+
+### Component Breakdown
+
+| Layer | Component | Responsibility |
+|---|---|---|
+| **Ingress** | `Baileys Socket Bridge` | Manages WhatsApp Web WebSocket lifecycle, pairing code negotiation, and end-to-end encryption. |
+| **Security** | `Security Guard` | Enforces phone number whitelisting (`OWNER_NUMBER`) so only authorized admins can run commands. |
+| **Routing** | `Command Dispatcher` | Analyzes prefixes (`$`, `.sh`, `.model`) or natural language prompts to route traffic appropriately. |
+| **Direct Execution** | `Shell Runner` | Spawns `/bin/bash` with timeout guards, capturing real-time stdout, stderr, and execution codes. |
+| **Agent Bridge** | `Antigravity Bridge` | Interfaces with the headless `agy` CLI in streaming JSON mode, maintaining multi-turn context. |
+| **Asset Delivery** | `Action Tag Parser` | Detects media tags (`[[SEND_FILE]]`, `[[SEND_IMAGE]]`, etc.) and dispatches files directly into chat. |
 
 ---
 
