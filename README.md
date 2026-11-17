@@ -1,105 +1,154 @@
 # wa2shell ⚡
 
-> **Bridge WhatsApp to Your Linux Terminal and Autonomous AI Agents.**  
-> Control your remote servers, execute bash commands, inspect codebases, and interact with headless Antigravity AI agents directly from any WhatsApp chat.
+> **Secure WhatsApp-to-Shell Gateway & Autonomous Antigravity Agent Controller.**  
+> Execute bash commands, monitor infrastructure, debug server environments, and converse with headless Antigravity AI agents directly over end-to-end encrypted WhatsApp chats.
 
 [![Node.js](https://img.shields.io/badge/Node.js-%3E%3D20.0.0-339933?style=flat&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
-[![Baileys](https://img.shields.io/badge/WhatsApp-Baileys-25D366?style=flat&logo=whatsapp&logoColor=white)](https://github.com/WhiskeySockets/Baileys)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Version](https://img.shields.io/badge/version-1.2.0-blue.svg?style=flat)](package.json)
+[![Baileys](https://img.shields.io/badge/WhatsApp-Baileys%20v6.7-25D366?style=flat&logo=whatsapp&logoColor=white)](https://github.com/WhiskeySockets/Baileys)
+[![Privacy First](https://img.shields.io/badge/Privacy-Zero%20Telemetry-orange?style=flat)](README.md#privacy-data-retention--telemetry)
+[![License: MIT](https://img.shields.io/badge/License-MIT-purple.svg)](LICENSE)
 
 ---
 
 ## Overview
 
-**wa2shell** turns your WhatsApp account into an interactive DevOps terminal and AI copilot. Built on top of **Baileys** and the **Antigravity CLI (`agy`)**, it provides a secure, low-latency bridge between WhatsApp chats and your Linux VPS. 
+**wa2shell** bridges your WhatsApp messaging client directly to your Linux VPS terminal and autonomous **Antigravity CLI (`agy`)** agents.
 
-Whether you need to monitor server health on the go, kick off deployment scripts, debug services in production, or let an autonomous agent edit files and run automated workflows, `wa2shell` handles it right from your mobile device without requiring SSH open to the public internet.
+Engineered for sysadmins, DevOps engineers, and self-hosters, `wa2shell` eliminates the need to expose open SSH ports to the public internet or maintain clunky mobile terminal apps. From any authorized WhatsApp chat, you can execute privileged POSIX shell commands, inspect system health, trigger CI/CD pipelines, kill hung tasks, and command autonomous AI agents that can read, edit, and troubleshoot your codebase in real time.
+
+---
+
+## What's New in v1.2.0
+
+- 🛑 **Process Supervisor (`.kill` & `.ps`)**: Terminate running agent tasks or hung shell commands on demand with zero downtime.
+- 📄 **Automatic Large Output Spillover**: Terminal outputs exceeding WhatsApp message limits (>3500 chars) are automatically packaged and dispatched as downloadable `.txt` log files.
+- 🛡️ **Credential Sanitization Shield**: Outgoing outputs are filtered in-memory to redact API keys, Bearer tokens, GitHub PATs, and private keys before reaching WhatsApp.
+- ⏱️ **Real-Time Reaction Timeline**: Visual feedback via dynamic message reactions (`⚡` started -> `⚙️` bash tool -> `📝` file edit -> `✅` completed).
+- 📜 **Local Append-Only Audit Logging**: Every shell command and agent prompt is securely recorded to `tmp/audit.log` with sender identification and exit codes.
+- 🚀 **Fixed Model Scoping**: Hardened dynamic Antigravity backend model switching across hot-reload cycles.
+
+---
+
+## Architecture
+
+`wa2shell` uses a multi-tier decoupled architecture designed for high availability, zero-downtime hot-reloading, strict security perimeters, and low latency.
+
+```mermaid
+flowchart TB
+    subgraph Client["📱 Ingress Interface"]
+        WA["WhatsApp Client<br/>(Mobile / Desktop / Web)"]
+    end
+
+    subgraph Transport["🔒 Transport & Ingress Layer"]
+        Socket["Baileys Socket Engine<br/><i>E2EE WebSocket • Multi-Device Auth</i>"]
+    end
+
+    subgraph Security["🛡️ Security & Privacy Perimeter"]
+        AuthGuard{"Access Guard<br/><i>Phone Number Whitelist</i>"}
+        Sanitizer["Sanitization Shield<br/><i>Secret Redaction & Spillover</i>"]
+        AuditLog[("Local Audit Log<br/><code>tmp/audit.log</code>")]
+    end
+
+    subgraph Core["⚡ wa2shell Dispatcher & Lifecycle"]
+        Dispatcher["Message Router & Parser<br/><i>Commands • Shell • Agent Prompts</i>"]
+        ProcMgr["Process Supervisor<br/><code>.kill • .ps • Active Map</code>"]
+        HotReload["Zero-Downtime Hot-Reloader<br/><i>Require Cache Purge & Watcher</i>"]
+    end
+
+    subgraph Execution["⚙️ Dual Execution Engines"]
+        ShellEngine["Direct Shell Runner<br/><code>/bin/bash (Timeout & Signal Ctrl)</code>"]
+        AgyBridge["Antigravity CLI Bridge<br/><code>agy (stream-json IPC Stream)</code>"]
+    end
+
+    subgraph Runtime["🖥️ Host & Autonomous Runtime"]
+        LinuxHost["Linux OS Environment<br/><i>(Filesystem, PM2, Docker, Ports)</i>"]
+        AgyAgent["Autonomous Agent System<br/><i>(Tools, Workflows, Reasoning, Skills)</i>"]
+    end
+
+    %% Flow Connections
+    WA <-->|"Encrypted Noise Protocol"| Socket
+    Socket -->|"Inbound Event"| AuthGuard
+    AuthGuard -->|"Authorized Owner"| Dispatcher
+    AuthGuard -.->|"Unauthorized"| Deny["Drop & Security Log"]
+
+    Dispatcher -->|"Process Control"| ProcMgr
+    Dispatcher -->|"Shell Prefix: $, .sh"| ShellEngine
+    Dispatcher -->|"Direct Prompt / .ai"| AgyBridge
+    HotReload -.->|"Refreshes Modules"| Dispatcher
+
+    ShellEngine -->|"Spawn Process"| LinuxHost
+    AgyBridge -->|"Spawn IPC Stream"| AgyAgent
+    AgyAgent -->|"Tool Calls (Bash, Files)"| LinuxHost
+
+    ShellEngine -->|"Exit Code & Stdout"| Sanitizer
+    AgyBridge -->|"Streaming Response & Actions"| Sanitizer
+    Dispatcher -.->|"Record Event"| AuditLog
+
+    Sanitizer -->|"Safe Text & Media Dispatches"| Socket
+```
+
+### Architectural Highlights
+
+1. **Ingress & Transport Layer**:
+   Leverages WhiskeySockets/Baileys to maintain persistent, end-to-end encrypted WebSockets with WhatsApp servers using modern Multi-Device Noise protocol authentication.
+2. **Security & Sanitization Perimeter**:
+   Incoming frames are authenticated against strict phone number whitelisting (`OWNER_NUMBER`). Outbound terminal data passes through the **Sanitization Shield**, which scrubs high-entropy credentials and redirects overflow output (>3500 bytes) into structured document attachments.
+3. **Dual Execution Core**:
+   - **Deterministic Shell Runner**: Direct non-interactive `/bin/bash` runner with configurable timeouts, PID tracking, and buffer safety.
+   - **Autonomous Agent Bridge**: Communicates with the `agy` CLI binary using bidirectional JSON stream events (`stream-json`), handling multi-turn conversational memory, skill execution, and tool hooks.
+4. **Resilience & Zero-Downtime Hot-Reload**:
+   File watchers observe changes across `lib/` and `config.js`, clearing Node's `require.cache` instantly on edit so updates apply immediately without disconnecting the WhatsApp socket.
 
 ---
 
 ## Key Features
 
 - **Autonomous Agent Integration**  
-  Communicates with the Antigravity agent CLI in headless JSON-streaming mode (`stream-json`), providing structured agent thoughts, tool execution tracking, and conversational responses.
+  Communicates with Antigravity agents in headless stream-json mode, yielding structured reasoning, tool lifecycle tracking, and direct file modifications.
+- **Direct Shell Command Runner**  
+  Run terminal commands using the `$` or `.sh` prefix (e.g., `$ docker ps`, `$ git status`, `$ systemctl restart caddy`) with exit codes and execution durations.
+- **Process Supervisor (`.kill` / `.ps`)**  
+  Monitor all running subprocesses and kill long-running or runaway jobs with a single message.
 - **Headless VPS Pairing Code**  
-  No painful ASCII QR code rendering over messy SSH terminals. Simply enter your bot's phone number and receive an official 8-digit WhatsApp pairing code to link instantly.
-- **Instant Direct Shell Execution**  
-  Run shell commands directly on your server using the `$` or `.sh` prefix (e.g., `$ htop`, `$ git status`, `$ systemctl status nginx`) with exit codes and execution runtimes.
+  Pair seamlessly without rendering ASCII QR codes over terminal connections. Enter the bot phone number and authenticate using official 8-digit WhatsApp pairing codes.
 - **Stateful Per-Chat Sessions**  
-  Keeps multi-turn conversational context intact for each chat thread, backed by automatic memory management and TTL expiration.
+  Preserves conversational context for each chat with automated TTL expiration (`SESSION_TTL_MS`).
 - **Hot Model Switching**  
-  Switch active agent models on the fly (e.g., Gemini, Claude) via `.model <model-name>` without taking down the daemon or interrupting connected clients.
-- **Zero-Downtime Hot Reload**  
-  Built-in file watcher and `.reload` command that instantly refreshes modules (`lib/` & `config.js`) on change without dropping the WhatsApp socket connection or restarting PM2.
-- **Automated Media & Artifact Delivery**  
-  Dispatches files, diagnostic logs, generated images, voice notes, and reports straight into WhatsApp using structured action tags (`[[SEND_FILE:/path]]`).
-- **Owner Security Guard**  
-  Enforces strict phone number whitelisting so only verified server administrators can trigger shell commands and sensitive tool actions.
+  Switch active backend models instantly (e.g., Gemini, Claude) via `.model <model-id>` without restarting the daemon.
+- **Automated Media Delivery**  
+  Output action tags (`[[SEND_FILE:...]]`, `[[SEND_IMAGE:...]]`, `[[SEND_AUDIO:...]]`, `[[SEND_VIDEO:...]]`) to send files, plots, audio notes, and video recordings to WhatsApp.
 
 ---
 
-## Architecture
+## Command Reference
 
-```mermaid
-flowchart TD
-    subgraph Client["📱 Ingress Interface"]
-        WA["WhatsApp Client<br/>(Mobile / Desktop / Web)"]
-    end
-
-    subgraph Core["⚡ wa2shell Core Engine"]
-        Sock["Baileys Socket Bridge<br/><i>E2EE WebSocket Connection</i>"]
-        Guard{"Security Guard<br/><i>Owner Number Whitelist</i>"}
-        Router["Command Dispatcher<br/><i>Prefix Parser & Session Router</i>"]
-    end
-
-    subgraph Engines["⚙️ Dual Execution Engines"]
-        Bash["Direct Shell Runner<br/><code>/bin/bash (Stdout / Stderr)</code>"]
-        Agy["Antigravity AI Bridge<br/><code>agy CLI (stream-json IPC)</code>"]
-    end
-
-    subgraph Target["🖥️ Operating & Agent Environments"]
-        Linux["Linux Host Environment<br/><i>(Filesystem, PM2, Docker, Services)</i>"]
-        Agent["Autonomous Agent Subsystems<br/><i>(Tools, Memory, Reasoning, Context)</i>"]
-    end
-
-    WA <-->|"Encrypted WebSocket Protocol"| Sock
-    Sock -->|"Incoming Message Event"| Guard
-    Guard -->|"Authorized Owner"| Router
-    Guard -.->|"Unauthorized User"| Deny["Drop & Security Log"]
-
-    Router -->|"Prefix: $ or .sh"| Bash
-    Router -->|"Direct Chat / .ai / Mention"| Agy
-
-    Bash -->|"Executes Shell Commands"| Linux
-    Linux -->|"Exit Code & Runtime"| Bash
-
-    Agy -->|"Spawns IPC Stream"| Agent
-    Agent -->|"Tool Calls & Workspace Actions"| Linux
-    Agent -->|"Action Tags [[SEND_*]]"| Agy
-
-    Bash -->|"Formatted Monospace Output"| Sock
-    Agy -->|"Streaming Markdown & Media Assets"| Sock
-```
-
-### Component Breakdown
-
-| Layer | Component | Responsibility |
+| Command | Description | Example |
 |---|---|---|
-| **Ingress** | `Baileys Socket Bridge` | Manages WhatsApp Web WebSocket lifecycle, pairing code negotiation, and end-to-end encryption. |
-| **Security** | `Security Guard` | Enforces phone number whitelisting (`OWNER_NUMBER`) so only authorized admins can run commands. |
-| **Routing** | `Command Dispatcher` | Analyzes prefixes (`$`, `.sh`, `.model`) or natural language prompts to route traffic appropriately. |
-| **Direct Execution** | `Shell Runner` | Spawns `/bin/bash` with timeout guards, capturing real-time stdout, stderr, and execution codes. |
-| **Agent Bridge** | `Antigravity Bridge` | Interfaces with the headless `agy` CLI in streaming JSON mode, maintaining multi-turn context. |
-| **Asset Delivery** | `Action Tag Parser` | Detects media tags (`[[SEND_FILE]]`, `[[SEND_IMAGE]]`, etc.) and dispatches files directly into chat. |
+| `$ <cmd>` | Execute a bash command on the host VPS | `$ free -h` |
+| `.sh <cmd>` | Alternative syntax for bash execution | `.sh systemctl status nginx` |
+| `.kill` / `.stop` | Terminate running shell process or agent query in current chat | `.kill` |
+| `.ps` | List all active shell and agent tasks running on the host | `.ps` |
+| `.status` / `.ping` | Display VPS uptime, RAM usage, disk headroom, and model info | `.status` |
+| `.reload` / `.r` | Zero-downtime hot-reload of all `lib/` modules | `.reload` |
+| `.model` | Display currently loaded Antigravity agent model | `.model` |
+| `.model <id>` | Switch the agent backend model dynamically | `.model gemini-3.8-flash-high` |
+| `.reset` / `.clear` | Purge active conversation memory for this chat | `.reset` |
+| `Direct Message` | Queries the Antigravity agent directly (in 1-on-1 chats) | `Why is disk usage spiking in /var/log?` |
+| `.ai <prompt>` | Query the Antigravity agent inside WhatsApp groups | `.ai Analyze git log for the last 3 commits` |
 
 ---
 
-## Prerequisites
+## Action Tags (Agent-to-WhatsApp Media)
 
-- **Node.js**: `v20.0.0` or higher
-- **Antigravity CLI (`agy`)**: Installed and accessible in your system `PATH` or at `/root/.local/bin/agy`
-- **Linux Environment**: Ubuntu, Debian, CentOS, or any modern POSIX-compliant system
-- **Dedicated WhatsApp Account**: A secondary or business SIM card recommended for the bot
+When interacting with Antigravity, the agent can output action tags to deliver media files:
+
+- `[[SEND_FILE:/path/to/report.pdf]]` — Sends any file as a downloadable document.
+- `[[SEND_IMAGE:/path/to/chart.png]]` — Sends an image with automatic thumbnail preview.
+- `[[SEND_AUDIO:/path/to/voice.mp3]]` — Sends an audio note.
+- `[[SEND_VIDEO:/path/to/demo.mp4]]` — Sends a video clip.
+
+Tags are parsed and stripped from the agent's textual response before dispatching the requested media assets asynchronously.
 
 ---
 
@@ -116,8 +165,7 @@ cd wa2shell
 npm install
 ```
 
-### 3. Configure Environment Variables
-Copy the template configuration file:
+### 3. Configure Environment
 ```bash
 cp .env.example .env
 nano .env
@@ -125,17 +173,18 @@ nano .env
 
 Set the essential keys in `.env`:
 ```env
-# International phone number of the administrator (no leading + or dashes)
-OWNER_NUMBER="14155552671"
+# Administrator WhatsApp phone number in international format (no leading '+' or dashes)
+OWNER_NUMBER="6281234567890"
 
 # Headless pairing mode
 USE_PAIRING_CODE=true
-BOT_PHONE_NUMBER="14155559876"
+BOT_PHONE_NUMBER="6289876543210"
 
 # Antigravity CLI path and default model
 AGY_PATH="agy"
 AGY_DEFAULT_MODEL="gemini-3.8-flash-low"
 AGY_WORKDIR="/root"
+OWNER_ONLY=true
 ```
 
 ### 4. Run the Daemon
@@ -143,98 +192,79 @@ AGY_WORKDIR="/root"
 npm start
 ```
 
-If `USE_PAIRING_CODE=true` is enabled:
+If `USE_PAIRING_CODE=true`:
 1. The terminal prints an 8-digit code (e.g., `ABCD-1234`).
-2. Open WhatsApp on your mobile phone: **Settings** -> **Linked Devices** -> **Link a Device**.
-3. Select **Link with phone number instead** and enter the terminal pairing code.
-4. Once authenticated, session credentials are saved under `./session/`. Subsequent restarts reconnect automatically.
-
----
-
-## Command Reference
-
-| Command | Description | Example |
-|---|---|---|
-| `$ <cmd>` | Execute a bash command on the VPS | `$ free -m` |
-| `.sh <cmd>` | Alternative syntax for bash execution | `.sh systemctl restart caddy` |
-| `.status` / `.ping` | Show uptime, memory stats, and disk usage | `.status` |
-| `.reload` / `.r` | Zero-downtime hot-reload all `lib/` modules without dropping WhatsApp session | `.reload` |
-| `.model` | Display currently loaded Antigravity agent model | `.model` |
-| `.model <id>` | Switch the agent backend model on the fly | `.model claude-sonnet-5-5-high` |
-| `.reset` / `.clear` | Purge active conversation context for this chat | `.reset` |
-| Direct Message | Queries the Antigravity agent directly | `Inspect why memory jumped to 90%` |
-| `.ai <prompt>` | Query the Antigravity agent inside a WhatsApp group | `.ai Review the latest commit diff` |
-
----
-
-## Action Tags (Agent-to-WhatsApp Media)
-
-When interacting with Antigravity, the agent can output special action tags to deliver media directly into the chat:
-
-- `[[SEND_FILE:/path/to/report.pdf]]` — Sends any file as a downloadable document.
-- `[[SEND_IMAGE:/path/to/plot.png]]` — Sends an image with automatic thumbnail preview.
-- `[[SEND_AUDIO:/path/to/voice.mp3]]` — Sends an audio note.
-- `[[SEND_VIDEO:/path/to/output.mp4]]` — Sends a video clip.
-
-Tags are parsed and stripped from the agent's textual response before dispatching the requested media assets asynchronously.
-
----
-
-## Project Structure
-
-```
-wa2shell/
-├── index.js          # Main process entry point and Baileys socket lifecycle
-├── config.js         # Centralized environment variable loader and paths
-├── package.json      # Project dependencies and operational scripts
-├── .env.example      # Detailed environment template
-├── lib/
-│   ├── agy_bridge.js # Antigravity CLI streaming IPC bridge and session cache
-│   ├── handler.js    # Inbound message parsing, access control, and tag dispatch
-│   └── shell.js      # Child process runner for privileged bash commands
-├── session/          # Persistent Baileys multi-device auth state (git-ignored)
-└── tmp/              # Temporary scratch space for media and transient files
-```
+2. Open WhatsApp on your phone: **Settings** -> **Linked Devices** -> **Link a Device**.
+3. Tap **Link with phone number instead** and enter the code.
+4. Session credentials persist in `./session/` for automatic reconnection.
 
 ---
 
 ## Production Deployment (PM2)
 
-To keep `wa2shell` running persistently across reboots, use [PM2](https://pm2.keymetrics.io/):
-
 ```bash
 # Install PM2 globally
 npm install -g pm2
 
-# Start the bot daemon
+# Launch wa2shell daemon
 pm2 start index.js --name "wa2shell"
 
-# Save process list for system reboot
+# Save configuration for reboot persistence
 pm2 save
 pm2 startup
 ```
 
-To inspect live operational logs:
+To view live logs:
 ```bash
 pm2 logs wa2shell
 ```
 
 ---
 
-## Security & Best Practices
+## Privacy, Data Retention & Telemetry
 
-1. **Restrict Owner Numbers**: Always keep `OWNER_ONLY=true` in production to prevent unauthorized users from executing bash commands on your infrastructure.
-2. **Protect the Session Directory**: The `./session` folder contains sensitive WhatsApp cryptographic tokens. Keep directory permissions restricted (`chmod 700 session`).
-3. **Audit Shell History**: Sensitive environmental tokens or passwords should never be typed directly into plain group chats. Use 1-on-1 private messaging for sensitive server operations.
+`wa2shell` is architected from the ground up to guarantee maximum privacy and local data sovereignty:
+
+- **Zero External Telemetry**: `wa2shell` does not contain any third-party tracking, telemetry collectors, diagnostic beacons, or remote analytics reporting.
+- **Local Data Residence**: All cryptographic session keys (`./session/`), temporary working files (`./tmp/`), and audit trails (`./tmp/audit.log`) reside exclusively on your local server filesystem. No conversation data is stored on external databases or intermediary cloud servers.
+- **Ephemeral Session Memory**: Conversational contexts are stored in volatile process memory with configurable TTL expiration (`SESSION_TTL_MS`). Expired contexts are purged automatically.
+- **Credential Masking Shield**: Outbound bash outputs pass through an in-memory regex sanitization engine that redacts API keys, Bearer tokens, GitHub PATs, and private keys to minimize accidental data exposure in messaging threads.
+
+---
+
+## Legal Notice, Disclaimers & Misuse Policy
+
+> **PLEASE READ CAREFULLY BEFORE DEPLOYING OR USING THIS SOFTWARE.**
+
+### 1. Authorized Administrative Use Only
+`wa2shell` provides unauthenticated or whitelisted shell execution privileges and autonomous file manipulation capabilities directly on the host operating system. This software is designed and provided **exclusively for legitimate systems administration, software development, server monitoring, and authorized educational research** on infrastructure you legally own or for which you have received express, documented authorization to administer.
+
+### 2. Strict Prohibition of Misuse
+Under no circumstances may `wa2shell` be utilized for any illicit, harmful, or malicious activity, including but not limited to:
+- Gaining unauthorized access to systems, servers, or networks (intrusion/hacking).
+- Deploying, distributing, or hosting malware, ransomware, botnets, or spyware.
+- Conducting Denial of Service (DoS/DDoS) attacks or network disruptions.
+- Sending unsolicited bulk messages, spam, or abusive communications in violation of telecommunication or platform regulations.
+- Violating applicable local, national, or international computer crime and data protection laws (e.g., US Computer Fraud and Abuse Act, EU GDPR, Indonesian UU ITE).
+
+### 3. Compliance with Third-Party Terms of Service
+`wa2shell` connects to WhatsApp via reverse-engineered protocols implemented in the open-source Baileys library. **`wa2shell` is an independent project and is NOT affiliated with, sponsored by, authorized by, or endorsed by WhatsApp Inc., Meta Platforms, Inc., or Google LLC.**
+You are solely responsible for ensuring that your usage complies with WhatsApp's [Terms of Service](https://www.whatsapp.com/legal/terms-of-service) and [Business Policies](https://www.whatsapp.com/legal/business-policy). Use of automated bots on WhatsApp may result in phone number suspension or permanent account bans by Meta. The developers accept no liability for any action taken against your WhatsApp account.
+
+### 4. Disclaimer of Warranties and Limitation of Liability
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT.
+
+IN NO EVENT SHALL THE AUTHORS, COPYRIGHT HOLDERS, OR CONTRIBUTORS BE LIABLE FOR ANY CLAIM, DAMAGES, LOSS OF DATA, SYSTEM COMPROMISE, FINANCIAL LOSS, HARDWARE DAMAGE, OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. YOU ASSUME COMPLETE OPERATIONAL RESPONSIBILITY FOR ALL COMMANDS EXECUTED AND ACTIONS TAKEN BY THE SOFTWARE ON YOUR SERVERS.
 
 ---
 
 ## Contributing
 
-Contributions, bug reports, and pull requests are welcome. Feel free to open an issue to discuss enhancements, feature ideas, or protocol compatibility updates.
+Contributions, issues, and feature suggestions are welcome! Feel free to submit a pull request or open an issue on the GitHub repository.
 
 ---
 
 ## License
 
-This project is open-source software licensed under the **[MIT License](LICENSE)**.
+This project is licensed under the **[MIT License](LICENSE)**.  
+Copyright © 2026 Elaina Cloud & Silvi.
