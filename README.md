@@ -4,7 +4,7 @@
 > Execute bash commands, monitor infrastructure, debug server environments, and converse with headless Antigravity AI agents directly over end-to-end encrypted WhatsApp chats.
 
 [![Node.js](https://img.shields.io/badge/Node.js-%3E%3D20.0.0-339933?style=flat&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
-[![Version](https://img.shields.io/badge/version-1.2.0-blue.svg?style=flat)](package.json)
+[![Version](https://img.shields.io/badge/version-1.3.0-blue.svg?style=flat)](package.json)
 [![Baileys](https://img.shields.io/badge/WhatsApp-Baileys%20v6.7-25D366?style=flat&logo=whatsapp&logoColor=white)](https://github.com/WhiskeySockets/Baileys)
 [![Privacy First](https://img.shields.io/badge/Privacy-Zero%20Telemetry-orange?style=flat)](README.md#privacy-data-retention--telemetry)
 [![License: MIT](https://img.shields.io/badge/License-MIT-purple.svg)](LICENSE)
@@ -16,6 +16,16 @@
 **wa2shell** bridges your WhatsApp messaging client directly to your Linux VPS terminal and autonomous **Antigravity CLI (`agy`)** agents.
 
 Engineered for sysadmins, DevOps engineers, and self-hosters, `wa2shell` eliminates the need to expose open SSH ports to the public internet or maintain clunky mobile terminal apps. From any authorized WhatsApp chat, you can execute privileged POSIX shell commands, inspect system health, trigger CI/CD pipelines, kill hung tasks, and command autonomous AI agents that can read, edit, and troubleshoot your codebase in real time.
+
+---
+
+## What's New in v1.3.0
+
+- 🖥️ **Hardware Telemetry Engine (`.sys` / `.top`)**: Real-time ASCII progress bars for CPU load, RAM allocation, Swap metrics, root disk capacity, and real-time top CPU & memory process consumers.
+- 📁 **Remote File Explorer & Log Streamer (`.ls`, `.cat`, `.tail`)**: Browse directories with human-readable file sizes, inspect configuration files safely, and tail live server logs (`.tail 50 /var/log/syslog`).
+- 📦 **Direct Server File Delivery (`.get` / `.dl`)**: Pull files from the Linux filesystem directly to WhatsApp as downloadable documents, complete with size and SHA256 integrity verification.
+- 🛡️ **Interactive Security Audit Trail (`.audit`)**: Review recent command executions, process kills, model switches, and file accesses directly inside WhatsApp.
+- 🧭 **Unified Command Center (`.help` / `.menu`)**: Fast in-chat categorized command directory.
 
 ---
 
@@ -123,19 +133,26 @@ flowchart TB
 
 ## Command Reference
 
-| Command | Description | Example |
-|---|---|---|
-| `$ <cmd>` | Execute a bash command on the host VPS | `$ free -h` |
-| `.sh <cmd>` | Alternative syntax for bash execution | `.sh systemctl status nginx` |
-| `.kill` / `.stop` | Terminate running shell process or agent query in current chat | `.kill` |
-| `.ps` | List all active shell and agent tasks running on the host | `.ps` |
-| `.status` / `.ping` | Display VPS uptime, RAM usage, disk headroom, and model info | `.status` |
-| `.reload` / `.r` | Zero-downtime hot-reload of all `lib/` modules | `.reload` |
-| `.model` | Display currently loaded Antigravity agent model | `.model` |
-| `.model <id>` | Switch the agent backend model dynamically | `.model gemini-3.8-flash-high` |
-| `.reset` / `.clear` | Purge active conversation memory for this chat | `.reset` |
-| `Direct Message` | Queries the Antigravity agent directly (in 1-on-1 chats) | `Why is disk usage spiking in /var/log?` |
-| `.ai <prompt>` | Query the Antigravity agent inside WhatsApp groups | `.ai Analyze git log for the last 3 commits` |
+| Command | Category | Description | Example |
+|---|---|---|---|
+| `.help` / `.menu` | System | Display categorized command center and usage guide | `.help` |
+| `.sys` / `.top` | System | Comprehensive hardware monitor & top process list | `.sys` |
+| `.status` / `.ping` | System | Quick VPS uptime, RAM headroom, and daemon status | `.status` |
+| `.ps` | Process | List active shell and agent tasks running on the host | `.ps` |
+| `.kill` / `.stop` | Process | Terminate active shell process or agent task in chat | `.kill` |
+| `.ls [dir]` | File System | List directory contents with file size formatting | `.ls /var/log` |
+| `.cat <file>` | File System | Read text file with auto-spillover and safety checks | `.cat package.json` |
+| `.tail [n] <file>` | File System | Stream last N lines of a file (default 25) | `.tail 50 /var/log/syslog` |
+| `.get <file>` | File System | Download server file directly to WhatsApp as document | `.get /root/backup.tar.gz` |
+| `$ <cmd>` | Shell | Execute bash command on host with timeout | `$ docker ps` |
+| `.sh <cmd>` | Shell | Alternative prefix for direct shell execution | `.sh systemctl status nginx` |
+| `.audit [n]` | Security | Display recent security audit events (default 10) | `.audit 15` |
+| `.reload` / `.r` | System | Zero-downtime hot-reload of all `lib/` modules | `.reload` |
+| `.model` | Agent | Display currently loaded Antigravity agent model | `.model` |
+| `.model <id>` | Agent | Switch agent backend model dynamically | `.model gemini-3.8-flash-high` |
+| `.reset` / `.clear` | Agent | Purge active conversation memory for this chat | `.reset` |
+| `Direct Message` | Agent | Queries Antigravity agent directly (in 1-on-1 chats) | `Why is disk usage spiking in /var/log?` |
+| `.ai <prompt>` | Agent | Query Antigravity agent inside WhatsApp groups | `.ai Analyze git log for the last 3 commits` |
 
 ---
 

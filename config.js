@@ -3,9 +3,19 @@
  * Handles environment variables and runtime settings.
  */
 
-require("dotenv").config();
 const path = require("path");
 const fs = require("fs");
+
+try {
+  require("dotenv").config();
+} catch (_) {
+  const envPath = path.join(__dirname, ".env");
+  if (typeof process.loadEnvFile === "function" && fs.existsSync(envPath)) {
+    try {
+      process.loadEnvFile(envPath);
+    } catch (_) {}
+  }
+}
 
 const ROOT_DIR = path.resolve(__dirname);
 const TMP_DIR = path.join(ROOT_DIR, "tmp");
