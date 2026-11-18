@@ -4,7 +4,7 @@
 > Execute bash commands, monitor infrastructure, debug server environments, and converse with headless Antigravity AI agents directly over end-to-end encrypted WhatsApp chats.
 
 [![Node.js](https://img.shields.io/badge/Node.js-%3E%3D20.0.0-339933?style=flat&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
-[![Version](https://img.shields.io/badge/version-1.4.0-blue.svg?style=flat)](package.json)
+[![Version](https://img.shields.io/badge/version-1.5.0-blue.svg?style=flat)](package.json)
 [![Baileys](https://img.shields.io/badge/WhatsApp-Baileys%20v6.7-25D366?style=flat&logo=whatsapp&logoColor=white)](https://github.com/WhiskeySockets/Baileys)
 [![Privacy First](https://img.shields.io/badge/Privacy-Zero%20Telemetry-orange?style=flat)](README.md#privacy-data-retention--telemetry)
 [![License: MIT](https://img.shields.io/badge/License-MIT-purple.svg)](LICENSE)
@@ -16,6 +16,20 @@
 **wa2shell** bridges your WhatsApp messaging client directly to your Linux VPS terminal and autonomous **Antigravity CLI (`agy`)** agents.
 
 Engineered for sysadmins, DevOps engineers, and self-hosters, `wa2shell` eliminates the need to expose open SSH ports to the public internet or maintain clunky mobile terminal apps. From any authorized WhatsApp chat, you can execute privileged POSIX shell commands, inspect system health, trigger CI/CD pipelines, kill hung tasks, and command autonomous AI agents that can read, edit, and troubleshoot your codebase in real time.
+
+---
+
+## What's New in v1.5.0
+
+- ⚡ **Live Agent Telemetry & Transparent Activity Engine (Anti-Stuck)**: Completely eliminates user uncertainty and silent wait states during multi-turn reasoning and tool runs.
+  - **Dynamic In-Place Status Card**: Replaces confusing silence with a living status card quoted to the user message that smoothly edits in real-time (`edit: msgKey`), displaying the active model, current step count, tool name, and running seconds counter.
+  - **Continuous Typing Presence Heartbeat**: Keeps WhatsApp's "typing..." (`composing`) state actively engaged throughout lengthy background operations, guaranteeing users know the bot is alive and processing.
+  - **Tool & Command Action Previews**: Live visual feedback for tool invocations (`⚙️ run_command: git status`, `📝 read_file: config.js`, `🔍 search_web: ...`), showing exactly what POSIX command or file is being accessed.
+  - **Transparent Execution Footers**: Every AI response now features an optional lightweight execution telemetry badge summarizing duration, model, and step count (`⚡ wa2shell v1.5.0 • 4.2s • gemini-3.8-flash-low • 3 langkah`).
+- 📊 **Step Execution Audit & Transparency Inspector (`.steps` & `--steps`)**:
+  - Run `.steps` / `.step` at any time to inspect a structured breakdown of tools executed, execution times per step, and arguments from the previous AI session.
+  - Prefix queries with `.ai --steps <prompt>` or `.ai -v <prompt>` to automatically append an in-depth execution trace table to the final answer.
+- 🛡️ **Long-Running Process Watchdog**: Active second ticker continuously updates the user if a command is processing in the background, eliminating the perception of frozen or hung processes.
 
 ---
 
@@ -172,7 +186,9 @@ flowchart TB
 | `.model <id>` | Agent | Switch agent backend model dynamically | `.model gemini-3.8-flash-high` |
 | `.reset` / `.clear` | Agent | Purge active conversation memory for this chat | `.reset` |
 | `Direct Message` | Agent | Queries Antigravity agent directly (in 1-on-1 chats) | `Why is disk usage spiking in /var/log?` |
-| `.ai <prompt>` | Agent | Query Antigravity agent inside WhatsApp groups | `.ai Analyze git log for the last 3 commits` |
+| `.ai <prompt>` | Agent | Query Antigravity agent with live progress card | `.ai Analyze git log for the last 3 commits` |
+| `.ai --steps <prompt>`| Agent | Query agent and display detailed execution steps | `.ai --steps Check and restart nginx service` |
+| `.steps` / `.step` | Agent | Inspect tool execution timeline of last query | `.steps` |
 
 ---
 

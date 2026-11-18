@@ -46,6 +46,10 @@ const config = {
     defaultModel: process.env.AGY_DEFAULT_MODEL || "gemini-3.8-flash-low",
     workDir: process.env.AGY_WORKDIR || process.cwd(),
     sessionTtlMs: parseInt(process.env.SESSION_TTL_MS, 10) || 5 * 60 * 1000,
+    liveProgress: process.env.AGY_LIVE_PROGRESS !== "false",
+    typingHeartbeat: process.env.AGY_TYPING_HEARTBEAT !== "false",
+    showExecutionFooter: process.env.AGY_SHOW_FOOTER !== "false",
+    progressThrottleMs: parseInt(process.env.AGY_PROGRESS_THROTTLE_MS, 10) || 1200,
   },
 
   paths: {
