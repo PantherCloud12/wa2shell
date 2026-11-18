@@ -136,11 +136,25 @@ async function startBot() {
       }
     } else if (connection === "open") {
       console.log("=======================================================");
-      console.log(`  WA2SHELL CONNECTED SUCCESSFULLY!`);
+      console.log(`  WA2SHELL CONNECTED SUCCESSFULLY! (v1.4.0)`);
       console.log(`  Bot Account   : ${sock.user?.id?.split(":")[0]}`);
       console.log(`  Active Model  : ${config.agy.defaultModel}`);
       console.log(`  Working Dir   : ${config.agy.workDir}`);
       console.log("=======================================================");
+
+      const ownerJid = config.ownerNumber ? config.ownerNumber + "@s.whatsapp.net" : null;
+      try {
+        const { startAutoUpdater } = require("./lib/updater");
+        startAutoUpdater(sock, ownerJid, reloadModules);
+      } catch (e) {
+        console.warn("[wa2shell] Auto-updater init warning:", e.message);
+      }
+      try {
+        const { startHealthWatchdog } = require("./lib/health");
+        startHealthWatchdog(sock, ownerJid, reloadModules);
+      } catch (e) {
+        console.warn("[wa2shell] Health watchdog init warning:", e.message);
+      }
     }
   });
 

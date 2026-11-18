@@ -4,7 +4,7 @@
 > Execute bash commands, monitor infrastructure, debug server environments, and converse with headless Antigravity AI agents directly over end-to-end encrypted WhatsApp chats.
 
 [![Node.js](https://img.shields.io/badge/Node.js-%3E%3D20.0.0-339933?style=flat&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
-[![Version](https://img.shields.io/badge/version-1.3.0-blue.svg?style=flat)](package.json)
+[![Version](https://img.shields.io/badge/version-1.4.0-blue.svg?style=flat)](package.json)
 [![Baileys](https://img.shields.io/badge/WhatsApp-Baileys%20v6.7-25D366?style=flat&logo=whatsapp&logoColor=white)](https://github.com/WhiskeySockets/Baileys)
 [![Privacy First](https://img.shields.io/badge/Privacy-Zero%20Telemetry-orange?style=flat)](README.md#privacy-data-retention--telemetry)
 [![License: MIT](https://img.shields.io/badge/License-MIT-purple.svg)](LICENSE)
@@ -19,7 +19,19 @@ Engineered for sysadmins, DevOps engineers, and self-hosters, `wa2shell` elimina
 
 ---
 
-## What's New in v1.3.0
+## What's New in v1.4.0
+
+- 🔄 **Automated Repository Updater & Scheduler (`.update`)**: Check for GitHub updates on demand (`.update check`), pull changes with automated `npm install` and zero-downtime hot-reload (`.update pull`), or enable a background scheduler (`.update auto on`, `.update interval 30`) that monitors GitHub automatically and notifies the administrator.
+- 🏥 **Autonomous System Health & Self-Healing Engine (`.health` / `.heal`)**: Comprehensive health audit covering CPU load averages, RAM allocation, Swap metrics, disk capacity, temp scratch bloat, and zombie process detection (`.health`). On-demand and automated self-healing (`.heal` / `.recovery`) that purges old scratch files, kills hung tasks, clears expired sessions, and defragments memory.
+- 💎 **WhatsApp-Native AI Response Typography Formatter (Anti-Berantakan)**: Complete overhaul of AI agent messaging for mobile readability. Transforms raw Markdown into native WhatsApp typography:
+  - Converts Markdown headers (`#`, `##`, `###`) into clean bold accent titles.
+  - Converts standard double-asterisk bold (`**text**`) and double underscores (`__text__`) into WhatsApp bold (`*text*`).
+  - Converts messy multi-column Markdown tables into structured mobile cards.
+  - Normalizes bullet lists (`-`, `+`, `*`) into clean bullet points (`•`, `◦`).
+  - Replaces `file:///` paths with clean inline backticks.
+  - Strips internal AI artifact wrappers (`<thought>`, `<thinking>`, XML blocks).
+  - Automatically closes unfinished code blocks to prevent chat text styling bleed.
+- ⏱️ **Autonomous Background Watchdogs**: Configurable background tasks in `index.js` for both automated repository updates and continuous memory/storage self-healing.
 
 - 🖥️ **Hardware Telemetry Engine (`.sys` / `.top`)**: Real-time ASCII progress bars for CPU load, RAM allocation, Swap metrics, root disk capacity, and real-time top CPU & memory process consumers.
 - 📁 **Remote File Explorer & Log Streamer (`.ls`, `.cat`, `.tail`)**: Browse directories with human-readable file sizes, inspect configuration files safely, and tail live server logs (`.tail 50 /var/log/syslog`).
@@ -136,6 +148,14 @@ flowchart TB
 | Command | Category | Description | Example |
 |---|---|---|---|
 | `.help` / `.menu` | System | Display categorized command center and usage guide | `.help` |
+| `.health` / `.doctor` | Health | Comprehensive system health audit & anomaly detection | `.health` |
+| `.heal` / `.recovery` | Health | Emergency self-healing: purge scratch files & kill zombies | `.heal` |
+| `.health auto <on\|off>` | Health | Toggle autonomous background health watchdog | `.health auto on` |
+| `.update` / `.update check` | Updater | Check remote GitHub repository for new commits | `.update` |
+| `.update pull` / `.update now`| Updater | Pull Git changes, install dependencies & hot-reload | `.update pull` |
+| `.update auto <on\|off>` | Updater | Toggle background auto-update schedule | `.update auto on` |
+| `.update interval <min>` | Updater | Set auto-update check frequency in minutes | `.update interval 30` |
+| `.update status` | Updater | View Git branch, commit hash, and scheduler state | `.update status` |
 | `.sys` / `.top` | System | Comprehensive hardware monitor & top process list | `.sys` |
 | `.status` / `.ping` | System | Quick VPS uptime, RAM headroom, and daemon status | `.status` |
 | `.ps` | Process | List active shell and agent tasks running on the host | `.ps` |

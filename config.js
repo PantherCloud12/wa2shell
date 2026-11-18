@@ -53,6 +53,21 @@ const config = {
     tmp: TMP_DIR,
     session: SESSION_DIR,
   },
+
+  updater: {
+    enabled: process.env.AUTO_UPDATE === "true",
+    intervalMinutes: parseInt(process.env.UPDATE_INTERVAL_MIN, 10) || 60,
+    branch: process.env.UPDATE_BRANCH || "main",
+    autoApply: process.env.AUTO_UPDATE_APPLY === "true",
+  },
+
+  health: {
+    autoRecovery: process.env.AUTO_RECOVERY !== "false",
+    checkIntervalMinutes: parseInt(process.env.HEALTH_CHECK_INTERVAL_MIN, 10) || 15,
+    memThresholdPercent: parseInt(process.env.HEALTH_MEM_THRESHOLD, 10) || 85,
+    diskThresholdPercent: parseInt(process.env.HEALTH_DISK_THRESHOLD, 10) || 90,
+    tmpMaxMb: parseInt(process.env.HEALTH_TMP_MAX_MB, 10) || 300,
+  },
 };
 
 module.exports = config;
