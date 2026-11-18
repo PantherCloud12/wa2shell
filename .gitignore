@@ -1,5 +1,10 @@
 # Dependency directories
 node_modules/
+tools/remotion/studio/node_modules/
+tools/remotion/studio/out/
+tools/remotion/studio/build/
+tools/remotion/studio/public/audio/
+tools/remotion/studio/*.mp4
 
 # Environment variables
 .env

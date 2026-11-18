@@ -19,6 +19,16 @@ Engineered for sysadmins, DevOps engineers, and self-hosters, `wa2shell` elimina
 
 ---
 
+## What's New in v1.6.0
+
+- 🎬 **Remotion Video Creation Skill & Tools (`skills/remotion-video/` & `tools/remotion/`)**:
+  - **Built-in Skill Discovery Engine (`lib/skills.js`)**: Automatically discovers Markdown skills in `skills/*/SKILL.md` and injects relevant skill instructions into Antigravity Agent prompts when video/motion-graphic requests are detected.
+  - **9:16 Portrait Motion Graphics Studio (`tools/remotion/templates/`)**: Pre-configured VPS-optimized Remotion studio (`1080x1920`, `30fps`, `rspack`, `x264 ultrafast`, `angle` OpenGL) with a 3-layer anti-slop `KineticShort` template (ambient glow, SVG cyber grid, animated circuit paths, kinetic typography, and per-scene audio).
+  - **Double-Boosted Edge-TTS & FFmpeg Pipeline (`lib/remotion.js` & `tools/remotion/cli.js`)**: Generates loud, crisp Indonesian/multilingual narration (`--volume=+50%` + FFmpeg `volume=2.2,alimiter=limit=0.98`), measures exact duration via `ffprobe`, and renders `.mp4` videos ready for `[[SEND_VIDEO:...]]` WhatsApp delivery.
+  - **New WhatsApp Commands**: `.video <topik>`, `.remotion [check|setup]`, and `.skills`.
+
+---
+
 ## What's New in v1.5.0
 
 - ⚡ **Live Agent Telemetry & Transparent Activity Engine (Anti-Stuck)**: Completely eliminates user uncertainty and silent wait states during multi-turn reasoning and tool runs.
@@ -189,6 +199,9 @@ flowchart TB
 | `.ai <prompt>` | Agent | Query Antigravity agent with live progress card | `.ai Analyze git log for the last 3 commits` |
 | `.ai --steps <prompt>`| Agent | Query agent and display detailed execution steps | `.ai --steps Check and restart nginx service` |
 | `.steps` / `.step` | Agent | Inspect tool execution timeline of last query | `.steps` |
+| `.video <topik>` | Remotion | Generate a 9:16 Remotion motion-graphic video with TTS narration | `.video Keunggulan Linux Server` |
+| `.remotion [check\|setup]` | Remotion | Check FFmpeg/Edge-TTS/Remotion readiness or scaffold studio | `.remotion setup` |
+| `.skills` | Skills | List all installed Antigravity skills in `skills/` | `.skills` |
 
 ---
 
