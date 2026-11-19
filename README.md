@@ -4,7 +4,7 @@
 > Execute bash commands, monitor infrastructure, debug server environments, and converse with headless Antigravity AI agents directly over end-to-end encrypted WhatsApp chats.
 
 [![Node.js](https://img.shields.io/badge/Node.js-%3E%3D20.0.0-339933?style=flat&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
-[![Version](https://img.shields.io/badge/version-2.0.0-blue.svg?style=flat)](package.json)
+[![Version](https://img.shields.io/badge/version-1.7.0-blue.svg?style=flat)](package.json)
 [![Baileys](https://img.shields.io/badge/WhatsApp-Baileys%20v6.7-25D366?style=flat&logo=whatsapp&logoColor=white)](https://github.com/WhiskeySockets/Baileys)
 [![Privacy First](https://img.shields.io/badge/Privacy-Zero%20Telemetry-orange?style=flat)](README.md#privacy-data-retention--telemetry)
 [![License: MIT](https://img.shields.io/badge/License-MIT-purple.svg)](LICENSE)
