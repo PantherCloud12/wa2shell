@@ -4,7 +4,7 @@
 > Execute bash commands, monitor infrastructure, debug server environments, and converse with headless Antigravity AI agents directly over end-to-end encrypted WhatsApp chats.
 
 [![Node.js](https://img.shields.io/badge/Node.js-%3E%3D20.0.0-339933?style=flat&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
-[![Version](https://img.shields.io/badge/version-1.5.0-blue.svg?style=flat)](package.json)
+[![Version](https://img.shields.io/badge/version-2.0.0-blue.svg?style=flat)](package.json)
 [![Baileys](https://img.shields.io/badge/WhatsApp-Baileys%20v6.7-25D366?style=flat&logo=whatsapp&logoColor=white)](https://github.com/WhiskeySockets/Baileys)
 [![Privacy First](https://img.shields.io/badge/Privacy-Zero%20Telemetry-orange?style=flat)](README.md#privacy-data-retention--telemetry)
 [![License: MIT](https://img.shields.io/badge/License-MIT-purple.svg)](LICENSE)
@@ -16,6 +16,22 @@
 **wa2shell** bridges your WhatsApp messaging client directly to your Linux VPS terminal and autonomous **Antigravity CLI (`agy`)** agents.
 
 Engineered for sysadmins, DevOps engineers, and self-hosters, `wa2shell` eliminates the need to expose open SSH ports to the public internet or maintain clunky mobile terminal apps. From any authorized WhatsApp chat, you can execute privileged POSIX shell commands, inspect system health, trigger CI/CD pipelines, kill hung tasks, and command autonomous AI agents that can read, edit, and troubleshoot your codebase in real time.
+
+---
+
+## What's New in v2.0.0
+
+- 🛡️ **Strict Reply-to-Bot Isolation & Media-Without-Prefix Guard**:
+  - **Zero Hijacked Replies**: Tracks outbound bot message IDs (`botMessageIds`) and verifies both `stanzaId` and `quotedParticipant` (`@s.whatsapp.net` & `@lid`) so replies between other users in a group never accidentally trigger the AI without an explicit prefix.
+  - **Media-Without-Prefix Guard**: Photos, videos, documents, stickers, and audio sent without an explicit command prefix (e.g. `.ai`, `.video`, `$ `) are cleanly ignored — even in private chat — preventing accidental triggers.
+  - **Ephemeral & ViewOnce Unwrapping**: Reliably unwraps `ephemeralMessage`, `viewOnceMessage`, and `documentWithCaptionMessage` wrappers.
+- 👁️ **Multimodal Vision & Quoted Context Injection**:
+  - Send an image with `.ai <prompt>` (or reply to an image with `.ai <prompt>`) to download and pass `[Attached Image: ...]` directly to the Antigravity agent for visual inspection.
+  - Replies to bot messages or `.ai` replies automatically inject quoted context into the prompt.
+- ⏰ **Autonomous Task & Cron Scheduler (`lib/scheduler.js`)**:
+  - Schedule recurring shell commands or AI checks directly from WhatsApp with `.cron add <min> <cmd|$ cmd>`, `.cron list`, `.cron del <id>`, and `.cron clear`.
+- ⚙️ **Quick Service & Network Ops**:
+  - Instant PM2 management (`.pm2 [list|restart <app>|logs <app>]`), sanitized network & port diagnostics (`.net`), and release info (`.version` / `.changelog`).
 
 ---
 

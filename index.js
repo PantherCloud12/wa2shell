@@ -16,6 +16,7 @@ const fs = require("fs");
 const path = require("path");
 let config = require("./config");
 let handlerModule = require("./lib/handler");
+const pkg = require("./package.json");
 
 const logger = pino({ level: "silent" });
 
@@ -136,7 +137,7 @@ async function startBot() {
       }
     } else if (connection === "open") {
       console.log("=======================================================");
-      console.log(`  WA2SHELL CONNECTED SUCCESSFULLY! (v1.4.0)`);
+      console.log(`  WA2SHELL CONNECTED SUCCESSFULLY! (v${pkg.version})`);
       console.log(`  Bot Account   : ${sock.user?.id?.split(":")[0]}`);
       console.log(`  Active Model  : ${config.agy.defaultModel}`);
       console.log(`  Working Dir   : ${config.agy.workDir}`);
@@ -154,6 +155,12 @@ async function startBot() {
         startHealthWatchdog(sock, ownerJid, reloadModules);
       } catch (e) {
         console.warn("[wa2shell] Health watchdog init warning:", e.message);
+      }
+      try {
+        const { startScheduler } = require("./lib/scheduler");
+        startScheduler(sock);
+      } catch (e) {
+        console.warn("[wa2shell] Scheduler init warning:", e.message);
       }
     }
   });
