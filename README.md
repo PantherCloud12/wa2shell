@@ -19,22 +19,6 @@ Engineered for sysadmins, DevOps engineers, and self-hosters, `wa2shell` elimina
 
 ---
 
-## What's New in v2.0.0
-
-- 🛡️ **Strict Reply-to-Bot Isolation & Media-Without-Prefix Guard**:
-  - **Zero Hijacked Replies**: Tracks outbound bot message IDs (`botMessageIds`) and verifies both `stanzaId` and `quotedParticipant` (`@s.whatsapp.net` & `@lid`) so replies between other users in a group never accidentally trigger the AI without an explicit prefix.
-  - **Media-Without-Prefix Guard**: Photos, videos, documents, stickers, and audio sent without an explicit command prefix (e.g. `.ai`, `.video`, `$ `) are cleanly ignored — even in private chat — preventing accidental triggers.
-  - **Ephemeral & ViewOnce Unwrapping**: Reliably unwraps `ephemeralMessage`, `viewOnceMessage`, and `documentWithCaptionMessage` wrappers.
-- 👁️ **Multimodal Vision & Quoted Context Injection**:
-  - Send an image with `.ai <prompt>` (or reply to an image with `.ai <prompt>`) to download and pass `[Attached Image: ...]` directly to the Antigravity agent for visual inspection.
-  - Replies to bot messages or `.ai` replies automatically inject quoted context into the prompt.
-- ⏰ **Autonomous Task & Cron Scheduler (`lib/scheduler.js`)**:
-  - Schedule recurring shell commands or AI checks directly from WhatsApp with `.cron add <min> <cmd|$ cmd>`, `.cron list`, `.cron del <id>`, and `.cron clear`.
-- ⚙️ **Quick Service & Network Ops**:
-  - Instant PM2 management (`.pm2 [list|restart <app>|logs <app>]`), sanitized network & port diagnostics (`.net`), and release info (`.version` / `.changelog`).
-
----
-
 ## What's New in v1.6.0
 
 - 🎬 **Remotion Video Creation Skill & Tools (`skills/remotion-video/` & `tools/remotion/`)**:
